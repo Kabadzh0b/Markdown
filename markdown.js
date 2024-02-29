@@ -233,6 +233,9 @@ const getFullFilePath = (basicPath) => {
     return path.join(__dirname, basicPath)
 }
 
+console.log('Oh no! Noting works anymore!')
+return
+
 const ARGS = process.argv
 
 const OUT_INDEX = ARGS.indexOf('--out')
