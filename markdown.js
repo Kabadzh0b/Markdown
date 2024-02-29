@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 const markdownCloseCheck = ({ indexes, name }) => {
     if (indexes.length % 2 !== 0) {
         console.error(`Invalid markdown, ${name} not closed`)
@@ -187,7 +190,7 @@ const markdownFunction = (markdown) => {
     let italicFlag = false
     let monospacedFlag = false
     let preformattedFlag = false
-    while (markdownPointer < markdown.length - 1) {
+    while (markdownPointer < markdown.length) {
         if (boldIndexes.includes(markdownPointer)) {
             if (!boldFlag) {
                 html += '<b>'
@@ -230,6 +233,37 @@ const markdownFunction = (markdown) => {
     }
     html += '</p>'
     console.log('result:', html)
+    return html
 }
 
-markdownFunction('```**He_llo** ```_world_ `how` are you?')
+const ARGS = process.argv
+
+const OUT_INDEX = ARGS.indexOf('--out')
+const OUTPUT_PATH = OUT_INDEX ? ARGS[OUT_INDEX + 1] : null
+
+const FROM_INDEX = ARGS.indexOf('--from')
+const FROM_PATH = FROM_INDEX ? ARGS[FROM_INDEX + 1] : null
+
+const getFullFilePath = (basicPath) => {
+    return path.join(__dirname, basicPath)
+}
+
+const FULL_FROM_PATH = getFullFilePath(FROM_PATH)
+const FULL_OUTPUT_PATH = getFullFilePath(OUTPUT_PATH)
+
+const readFile = () => {
+    return fs.readFileSync(FULL_FROM_PATH, {
+        encoding: 'utf8',
+    })
+}
+
+const MARKDOWN = readFile()
+
+const HTML = markdownFunction(MARKDOWN)
+if (!HTML) {
+    return
+}
+
+if (OUTPUT_PATH) {
+    fs.writeFileSync(FULL_OUTPUT_PATH, HTML)
+}
