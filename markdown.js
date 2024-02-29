@@ -175,12 +175,6 @@ const markdownFunction = (markdown) => {
         monospacedIndexes,
         preformattedIndexes
     )
-    console.log('bold:', boldIndexes)
-    console.log(italicIndexes)
-    console.log(monospacedIndexes)
-    console.log('preformatted:', preformattedIndexes)
-    console.log(newParagraphIndexes)
-    console.log(isCorrect)
     if (!isCorrect) {
         return false
     }
@@ -232,26 +226,29 @@ const markdownFunction = (markdown) => {
         }
     }
     html += '</p>'
-    console.log('result:', html)
     return html
 }
-
-const ARGS = process.argv
-
-const OUT_INDEX = ARGS.indexOf('--out')
-const OUTPUT_PATH = OUT_INDEX ? ARGS[OUT_INDEX + 1] : null
-
-const FROM_INDEX = ARGS.indexOf('--from')
-const FROM_PATH = FROM_INDEX ? ARGS[FROM_INDEX + 1] : null
 
 const getFullFilePath = (basicPath) => {
     return path.join(__dirname, basicPath)
 }
 
-const FULL_FROM_PATH = getFullFilePath(FROM_PATH)
-const FULL_OUTPUT_PATH = getFullFilePath(OUTPUT_PATH)
+const ARGS = process.argv
+
+const OUT_INDEX = ARGS.indexOf('--out')
+const OUTPUT_PATH = OUT_INDEX !== -1 ? ARGS[OUT_INDEX + 1] : null
+
+const FROM_INDEX = ARGS.indexOf('--from')
+const FROM_PATH = FROM_INDEX !== -1 ? ARGS[FROM_INDEX + 1] : null
+
+const FULL_FROM_PATH = FROM_PATH !== null ? getFullFilePath(FROM_PATH) : null
+const FULL_OUTPUT_PATH =
+    OUTPUT_PATH !== null ? getFullFilePath(OUTPUT_PATH) : null
 
 const readFile = () => {
+    if (!FROM_PATH) {
+        return 'Looks like you didn`t added a input file path\nBut it`s ok, you can get my test case:\n```**He_llo** ```_world_ `how` are you?'
+    }
     return fs.readFileSync(FULL_FROM_PATH, {
         encoding: 'utf8',
     })
@@ -263,6 +260,7 @@ const HTML = markdownFunction(MARKDOWN)
 if (!HTML) {
     return
 }
+console.log('result:', HTML)
 
 if (OUTPUT_PATH) {
     fs.writeFileSync(FULL_OUTPUT_PATH, HTML)
