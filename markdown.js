@@ -1,6 +1,6 @@
-const markdownCloseCheck = (indexes, indexesName) => {
+const markdownCloseCheck = ({ indexes, name }) => {
     if (indexes.length % 2 !== 0) {
-        console.error(`Invalid markdown, ${indexesName} not closed`)
+        console.error(`Invalid markdown, ${name} not closed`)
         return false
     }
     return true
@@ -8,7 +8,8 @@ const markdownCloseCheck = (indexes, indexesName) => {
 
 const markdownInsideOtherMarkdownCheck = (
     indexesInsideObject,
-    indexesOutsideObject
+    indexesOutsideObject,
+    deleteFlag = false
 ) => {
     const indexesInside = indexesInsideObject.indexes
     const indexesOutside = indexesOutsideObject.indexes
@@ -18,38 +19,22 @@ const markdownInsideOtherMarkdownCheck = (
                 indexesInside[i] > indexesOutside[j] &&
                 indexesInside[i] < indexesOutside[j + 1]
             ) {
-                console.error(
-                    `Invalid markdown, ${indexesInsideObject.name} inside ${indexesOutsideObject.name}`
-                )
-                return false
+                if (deleteFlag) {
+                    indexesInside.splice(i, 1)
+                    i--
+                } else {
+                    console.error(
+                        `Invalid markdown, ${indexesInsideObject.name} inside ${indexesOutsideObject.name}`
+                    )
+                    return false
+                }
             }
         }
     }
     return true
 }
 
-const tagsInsideOtherTagsCheck = (
-    boldIndexes,
-    italicIndexes,
-    monospacedIndexes
-) => {
-    const boldIndexesObject = {
-        indexes: boldIndexes,
-        name: 'bold',
-    }
-    const italicIndexesObject = {
-        indexes: italicIndexes,
-        name: 'italic',
-    }
-    const monospacedIndexesObject = {
-        indexes: monospacedIndexes,
-        name: 'monospaced',
-    }
-    const checkObjects = [
-        boldIndexesObject,
-        italicIndexesObject,
-        monospacedIndexesObject,
-    ]
+const tagsInsideOtherTagsCheck = (checkObjects) => {
     for (let i = 0; i < checkObjects.length; i++) {
         for (let j = 0; j < checkObjects.length; j++) {
             if (i !== j) {
@@ -67,6 +52,20 @@ const tagsInsideOtherTagsCheck = (
             }
         }
     }
+    return true
+}
+
+const deleteAllIndexesInsidePreformatted = (
+    checkObjects,
+    preformattedIndexes
+) => {
+    for (let i = 0; i < checkObjects.length; i++) {
+        markdownInsideOtherMarkdownCheck(
+            checkObjects[i],
+            preformattedIndexes,
+            true
+        )
+    }
 }
 
 const isMarkdownCorrect = (
@@ -75,15 +74,42 @@ const isMarkdownCorrect = (
     monospacedIndexes,
     preformattedIndexes
 ) => {
-    const isBoldMarkdownCorrect = markdownCloseCheck(boldIndexes, 'bold')
-    const isItalicMarkdownCorrect = markdownCloseCheck(italicIndexes, 'italic')
-    const isMonospacesMarkdownCorrect = markdownCloseCheck(
-        monospacedIndexes,
-        'monospaced'
-    )
+    const preformattedIndexesObject = {
+        indexes: preformattedIndexes,
+        name: 'preformatted',
+    }
+
     const isPreformattedMarkdownCorrect = markdownCloseCheck(
-        preformattedIndexes,
-        'preformatted'
+        preformattedIndexesObject
+    )
+
+    const boldIndexesObject = {
+        indexes: boldIndexes,
+        name: 'bold',
+    }
+    const italicIndexesObject = {
+        indexes: italicIndexes,
+        name: 'italic',
+    }
+    const monospacedIndexesObject = {
+        indexes: monospacedIndexes,
+        name: 'monospaced',
+    }
+
+    const checkObjects = [
+        boldIndexesObject,
+        italicIndexesObject,
+        monospacedIndexesObject,
+    ]
+    // Deleting all indexes that are inside preformatted
+    deleteAllIndexesInsidePreformatted(checkObjects, preformattedIndexesObject)
+
+    const correctLocated = tagsInsideOtherTagsCheck(checkObjects)
+
+    const isBoldMarkdownCorrect = markdownCloseCheck(boldIndexesObject)
+    const isItalicMarkdownCorrect = markdownCloseCheck(italicIndexesObject)
+    const isMonospacesMarkdownCorrect = markdownCloseCheck(
+        monospacedIndexesObject
     )
     if (
         !isBoldMarkdownCorrect ||
@@ -93,12 +119,6 @@ const isMarkdownCorrect = (
     ) {
         return false
     }
-
-    const correctLocated = tagsInsideOtherTagsCheck(
-        boldIndexes,
-        italicIndexes,
-        monospacedIndexes
-    )
     return correctLocated
 }
 
@@ -108,7 +128,7 @@ const markdownFunction = (markdown) => {
     const monospacedIndexes = []
     const preformattedIndexes = []
     const newParagraphIndexes = []
-    const notTextSymbols = ['*', '_', '`', ' ', '\n']
+    const notTextSymbols = ['*', '_', '`', ' ', '\n', undefined]
     const notTextSymbolsCheck = (i) => {
         return notTextSymbols.includes(markdown[i])
     }
@@ -146,20 +166,21 @@ const markdownFunction = (markdown) => {
             newParagraphIndexes.push(i)
         }
     }
-
-    console.log(boldIndexes)
+    const isCorrect = isMarkdownCorrect(
+        boldIndexes,
+        italicIndexes,
+        monospacedIndexes,
+        preformattedIndexes
+    )
+    console.log('bold:', boldIndexes)
     console.log(italicIndexes)
     console.log(monospacedIndexes)
-    console.log(preformattedIndexes)
+    console.log('preformatted:', preformattedIndexes)
     console.log(newParagraphIndexes)
-    console.log(
-        isMarkdownCorrect(
-            boldIndexes,
-            italicIndexes,
-            monospacedIndexes,
-            preformattedIndexes
-        )
-    )
+    console.log(isCorrect)
+    if (!isCorrect) {
+        return false
+    }
 }
 
-markdownFunction('`**Hello\n\n**`')
+markdownFunction('````_****Hello**```')
