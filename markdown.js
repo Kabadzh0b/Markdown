@@ -45,31 +45,28 @@ const tagsInsideOtherTagsCheck = (
         indexes: monospacedIndexes,
         name: 'monospaced',
     }
-    const x1 = markdownInsideOtherMarkdownCheck(
+    const checkObjects = [
         boldIndexesObject,
-        italicIndexesObject
-    )
-    const x2 = markdownInsideOtherMarkdownCheck(
         italicIndexesObject,
-        boldIndexesObject
-    )
-    const x3 = markdownInsideOtherMarkdownCheck(
         monospacedIndexesObject,
-        boldIndexesObject
-    )
-    const x4 = markdownInsideOtherMarkdownCheck(
-        boldIndexesObject,
-        monospacedIndexesObject
-    )
-    const x5 = markdownInsideOtherMarkdownCheck(
-        italicIndexesObject,
-        monospacedIndexesObject
-    )
-    const x6 = markdownInsideOtherMarkdownCheck(
-        monospacedIndexesObject,
-        italicIndexesObject
-    )
-    return x1 && x2 && x3 && x4 && x5 && x6
+    ]
+    for (let i = 0; i < checkObjects.length; i++) {
+        for (let j = 0; j < checkObjects.length; j++) {
+            if (i !== j) {
+                const x1 = markdownInsideOtherMarkdownCheck(
+                    checkObjects[i],
+                    checkObjects[j]
+                )
+                const x2 = markdownInsideOtherMarkdownCheck(
+                    checkObjects[j],
+                    checkObjects[i]
+                )
+                if (!x1 || !x2) {
+                    return false
+                }
+            }
+        }
+    }
 }
 
 const isMarkdownCorrect = (
@@ -110,6 +107,7 @@ const markdownFunction = (markdown) => {
     const italicIndexes = []
     const monospacedIndexes = []
     const preformattedIndexes = []
+    const newParagraphIndexes = []
     const notTextSymbols = ['*', '_', '`', ' ', '\n']
     const notTextSymbolsCheck = (i) => {
         return notTextSymbols.includes(markdown[i])
@@ -140,6 +138,12 @@ const markdownFunction = (markdown) => {
             (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 1))
         ) {
             monospacedIndexes.push(i)
+        } else if (
+            markdown[i] === '\n' &&
+            markdown[i + 1] === '\n' &&
+            (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 2))
+        ) {
+            newParagraphIndexes.push(i)
         }
     }
 
@@ -147,6 +151,7 @@ const markdownFunction = (markdown) => {
     console.log(italicIndexes)
     console.log(monospacedIndexes)
     console.log(preformattedIndexes)
+    console.log(newParagraphIndexes)
     console.log(
         isMarkdownCorrect(
             boldIndexes,
@@ -157,4 +162,4 @@ const markdownFunction = (markdown) => {
     )
 }
 
-markdownFunction('`**Hello**`')
+markdownFunction('`**Hello\n\n**`')
