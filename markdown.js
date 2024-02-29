@@ -110,23 +110,35 @@ const markdownFunction = (markdown) => {
     const italicIndexes = []
     const monospacedIndexes = []
     const preformattedIndexes = []
+    const notTextSymbols = ['*', '_', '`', ' ', '\n']
+    const notTextSymbolsCheck = (i) => {
+        return notTextSymbols.includes(markdown[i])
+    }
     for (let i = 0; i < markdown.length; i++) {
-        if (markdown[i] === '*' && markdown[i + 1] === '*') {
+        if (
+            markdown[i] === '*' &&
+            markdown[i + 1] === '*' &&
+            (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 2))
+        ) {
             boldIndexes.push(i)
             i++
         } else if (
             markdown[i] === '_' &&
-            (markdown[i + 1] === ' ' || markdown[i - 1] === ' ')
+            (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 1))
         ) {
             italicIndexes.push(i)
         } else if (
             markdown[i] === '`' &&
             markdown[i + 1] === '`' &&
-            markdown[i + 2] === '`'
+            markdown[i + 2] === '`' &&
+            (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 3))
         ) {
             preformattedIndexes.push(i)
             i += 2
-        } else if (markdown[i] === '`') {
+        } else if (
+            markdown[i] === '`' &&
+            (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 1))
+        ) {
             monospacedIndexes.push(i)
         }
     }
@@ -145,4 +157,4 @@ const markdownFunction = (markdown) => {
     )
 }
 
-markdownFunction('`** Hello ** **`')
+markdownFunction('`**Hello**`')
