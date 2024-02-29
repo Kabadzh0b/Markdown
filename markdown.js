@@ -18,10 +18,7 @@ const markdownInsideOtherMarkdownCheck = (
     const indexesOutside = indexesOutsideObject.indexes
     for (let i = 0; i < indexesInside.length; i++) {
         for (let j = 0; j < indexesOutside.length; j += 2) {
-            if (
-                indexesInside[i] > indexesOutside[j] &&
-                indexesInside[i] < indexesOutside[j + 1]
-            ) {
+            if (indexesInside[i] > indexesOutside[j] && indexesInside[i] < indexesOutside[j + 1]) {
                 if (deleteFlag) {
                     indexesInside.splice(i, 1)
                     i--
@@ -41,14 +38,8 @@ const tagsInsideOtherTagsCheck = (checkObjects) => {
     for (let i = 0; i < checkObjects.length; i++) {
         for (let j = 0; j < checkObjects.length; j++) {
             if (i !== j) {
-                const x1 = markdownInsideOtherMarkdownCheck(
-                    checkObjects[i],
-                    checkObjects[j]
-                )
-                const x2 = markdownInsideOtherMarkdownCheck(
-                    checkObjects[j],
-                    checkObjects[i]
-                )
+                const x1 = markdownInsideOtherMarkdownCheck(checkObjects[i], checkObjects[j])
+                const x2 = markdownInsideOtherMarkdownCheck(checkObjects[j], checkObjects[i])
                 if (!x1 || !x2) {
                     return false
                 }
@@ -58,33 +49,19 @@ const tagsInsideOtherTagsCheck = (checkObjects) => {
     return true
 }
 
-const deleteAllIndexesInsidePreformatted = (
-    checkObjects,
-    preformattedIndexes
-) => {
+const deleteAllIndexesInsidePreformatted = (checkObjects, preformattedIndexes) => {
     for (let i = 0; i < checkObjects.length; i++) {
-        markdownInsideOtherMarkdownCheck(
-            checkObjects[i],
-            preformattedIndexes,
-            true
-        )
+        markdownInsideOtherMarkdownCheck(checkObjects[i], preformattedIndexes, true)
     }
 }
 
-const isMarkdownCorrect = (
-    boldIndexes,
-    italicIndexes,
-    monospacedIndexes,
-    preformattedIndexes
-) => {
+const isMarkdownCorrect = (boldIndexes, italicIndexes, monospacedIndexes, preformattedIndexes) => {
     const preformattedIndexesObject = {
         indexes: preformattedIndexes,
         name: 'preformatted',
     }
 
-    const isPreformattedMarkdownCorrect = markdownCloseCheck(
-        preformattedIndexesObject
-    )
+    const isPreformattedMarkdownCorrect = markdownCloseCheck(preformattedIndexesObject)
 
     const boldIndexesObject = {
         indexes: boldIndexes,
@@ -99,11 +76,7 @@ const isMarkdownCorrect = (
         name: 'monospaced',
     }
 
-    const checkObjects = [
-        boldIndexesObject,
-        italicIndexesObject,
-        monospacedIndexesObject,
-    ]
+    const checkObjects = [boldIndexesObject, italicIndexesObject, monospacedIndexesObject]
     // Deleting all indexes that are inside preformatted
     deleteAllIndexesInsidePreformatted(checkObjects, preformattedIndexesObject)
 
@@ -111,9 +84,7 @@ const isMarkdownCorrect = (
 
     const isBoldMarkdownCorrect = markdownCloseCheck(boldIndexesObject)
     const isItalicMarkdownCorrect = markdownCloseCheck(italicIndexesObject)
-    const isMonospacesMarkdownCorrect = markdownCloseCheck(
-        monospacedIndexesObject
-    )
+    const isMonospacesMarkdownCorrect = markdownCloseCheck(monospacedIndexesObject)
     if (
         !isBoldMarkdownCorrect ||
         !isItalicMarkdownCorrect ||
@@ -242,8 +213,7 @@ const FROM_INDEX = ARGS.indexOf('--from')
 const FROM_PATH = FROM_INDEX !== -1 ? ARGS[FROM_INDEX + 1] : null
 
 const FULL_FROM_PATH = FROM_PATH !== null ? getFullFilePath(FROM_PATH) : null
-const FULL_OUTPUT_PATH =
-    OUTPUT_PATH !== null ? getFullFilePath(OUTPUT_PATH) : null
+const FULL_OUTPUT_PATH = OUTPUT_PATH !== null ? getFullFilePath(OUTPUT_PATH) : null
 
 const readFile = () => {
     if (!FROM_PATH) {
