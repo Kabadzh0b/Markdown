@@ -183,28 +183,53 @@ const markdownFunction = (markdown) => {
     }
     let html = '<p>'
     let markdownPointer = 0
+    let boldFlag = false
+    let italicFlag = false
+    let monospacedFlag = false
+    let preformattedFlag = false
     while (markdownPointer < markdown.length - 1) {
         if (boldIndexes.includes(markdownPointer)) {
-            html += '<b>'
+            if (!boldFlag) {
+                html += '<b>'
+            } else {
+                html += '</b>'
+            }
+            boldFlag = !boldFlag
             markdownPointer += 2
         } else if (italicIndexes.includes(markdownPointer)) {
-            html += '<i>'
+            if (!italicFlag) {
+                html += '<i>'
+            } else {
+                html += '</i>'
+            }
+            italicFlag = !italicFlag
             markdownPointer++
         } else if (monospacedIndexes.includes(markdownPointer)) {
-            html += '<code>'
+            if (!monospacedFlag) {
+                html += '<code>'
+            } else {
+                html += '</code>'
+            }
+            monospacedFlag = !monospacedFlag
             markdownPointer++
         } else if (preformattedIndexes.includes(markdownPointer)) {
-            html += '<pre>'
+            if (!preformattedFlag) {
+                html += '<pre>'
+            } else {
+                html += '</pre>'
+            }
+            preformattedFlag = !preformattedFlag
             markdownPointer += 3
         } else if (newParagraphIndexes.includes(markdownPointer)) {
             html += '</p><p>'
             markdownPointer += 2
+        } else {
+            html += markdown[markdownPointer]
+            markdownPointer++
         }
-        html += markdown[markdownPointer]
-        markdownPointer++
     }
     html += '</p>'
     console.log('result:', html)
 }
 
-markdownFunction('**He_llo** _world_ `how` are you?')
+markdownFunction('```**He_llo** ```_world_ `how` are you?')
