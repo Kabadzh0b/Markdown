@@ -181,6 +181,30 @@ const markdownFunction = (markdown) => {
     if (!isCorrect) {
         return false
     }
+    let html = '<p>'
+    let markdownPointer = 0
+    while (markdownPointer < markdown.length - 1) {
+        if (boldIndexes.includes(markdownPointer)) {
+            html += '<b>'
+            markdownPointer += 2
+        } else if (italicIndexes.includes(markdownPointer)) {
+            html += '<i>'
+            markdownPointer++
+        } else if (monospacedIndexes.includes(markdownPointer)) {
+            html += '<code>'
+            markdownPointer++
+        } else if (preformattedIndexes.includes(markdownPointer)) {
+            html += '<pre>'
+            markdownPointer += 3
+        } else if (newParagraphIndexes.includes(markdownPointer)) {
+            html += '</p><p>'
+            markdownPointer += 2
+        }
+        html += markdown[markdownPointer]
+        markdownPointer++
+    }
+    html += '</p>'
+    console.log('result:', html)
 }
 
-markdownFunction('````_****Hello**```')
+markdownFunction('**He_llo** _world_ `how` are you?')
