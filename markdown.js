@@ -193,7 +193,6 @@ const markdownFunction = (markdown) => {
         }
     }
     html += '</p>'
-    console.log('newParagraphIndexes:', newParagraphIndexes)
     return html
 }
 
