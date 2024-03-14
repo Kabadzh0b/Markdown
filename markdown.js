@@ -212,6 +212,9 @@ const OUTPUT_PATH = OUT_INDEX !== -1 ? ARGS[OUT_INDEX + 1] : null
 const FROM_INDEX = ARGS.indexOf('--from')
 const FROM_PATH = FROM_INDEX !== -1 ? ARGS[FROM_INDEX + 1] : null
 
+const FORMAT_INDEX = ARGS.indexOf('--format')
+const FORMAT = FORMAT_INDEX !== -1 ? ARGS[FORMAT_INDEX + 1] : '7m'
+
 const FULL_FROM_PATH = FROM_PATH !== null ? getFullFilePath(FROM_PATH) : null
 const FULL_OUTPUT_PATH = OUTPUT_PATH !== null ? getFullFilePath(OUTPUT_PATH) : null
 
@@ -230,7 +233,7 @@ const HTML = markdownFunction(MARKDOWN)
 if (!HTML) {
     return
 }
-console.log('result:', HTML)
+console.log(`\x1b[${FORMAT}result:`, HTML)
 
 if (OUTPUT_PATH) {
     fs.writeFileSync(FULL_OUTPUT_PATH, HTML)
