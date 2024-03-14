@@ -132,11 +132,7 @@ const markdownFunction = (markdown) => {
             (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 1))
         ) {
             monospacedIndexes.push(i)
-        } else if (
-            markdown[i] === '\n' &&
-            markdown[i + 1] === '\n' &&
-            (notTextSymbolsCheck(i - 1) || notTextSymbolsCheck(i + 2))
-        ) {
+        } else if (markdown[i] === '\n' && markdown[i + 1] === '\n') {
             newParagraphIndexes.push(i)
         }
     }
@@ -197,6 +193,7 @@ const markdownFunction = (markdown) => {
         }
     }
     html += '</p>'
+    console.log('newParagraphIndexes:', newParagraphIndexes)
     return html
 }
 
@@ -231,10 +228,16 @@ const MARKDOWN = readFile()
 
 const HTML = markdownFunction(MARKDOWN)
 if (!HTML) {
-    return
+    console.log(
+        `\x1b[${FORMAT}I am sorry, but your markdown is incorrect. Please, check it and try again.`
+    )
 }
 console.log(`\x1b[${FORMAT}result:`, HTML)
 
 if (OUTPUT_PATH) {
     fs.writeFileSync(FULL_OUTPUT_PATH, HTML)
+}
+
+module.exports = {
+    markdownFunction,
 }
