@@ -97,8 +97,6 @@ const isMarkdownCorrect = (boldIndexes, italicIndexes, monospacedIndexes, prefor
 }
 
 const markdownFunction = (markdown) => {
-    console.log("Oh no, I'm a stub!")
-    return false
     const boldIndexes = []
     const italicIndexes = []
     const monospacedIndexes = []
